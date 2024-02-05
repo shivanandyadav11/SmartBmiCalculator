@@ -179,6 +179,7 @@ internal fun BMICalculatorContainer() {
                 }
             }
         }
+        MeasuringScaleComponent()
     }
 }
 
