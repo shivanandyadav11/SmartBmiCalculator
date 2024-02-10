@@ -83,6 +83,15 @@ internal fun BMICalculatorContainer() {
         mutableIntStateOf(0)
     }
 
+    val weightMeasureItems = remember {
+        listOf("Kg")
+    }
+    var weightExpanded by remember { mutableStateOf(false) }
+    var weightSelected by remember { mutableStateOf(true) }
+    val weight = remember {
+        mutableIntStateOf(0)
+    }
+
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
@@ -185,6 +194,71 @@ internal fun BMICalculatorContainer() {
         }
         MeasuringScaleComponent( matchingPosition = {
             length.intValue = it
+        }
+        )
+        // Start of Weight Region
+        Row {
+            Text(
+                text = stringResource(id = R.string.weight),
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.weight(1f)
+            )
+
+            val iconId = "linkIcon"
+            val inlineIcon = InlineTextContent(
+                Placeholder(
+                    width = 24.sp,
+                    height = 24.sp,
+                    placeholderVerticalAlign = PlaceholderVerticalAlign.Bottom,
+                ),
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_arrow_drop_down_24),
+                    contentDescription = null,
+                    tint = LightGreen40,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .padding(top = 4.dp),
+                )
+            }
+            val annotatedText = buildAnnotatedString {
+                withStyle(
+                    style = SpanStyle(
+                        color = LightGreen40,
+                        fontSize = 16.sp,
+                    ),
+                ) { append(if (weightSelected) weightMeasureItems[0] else weightMeasureItems[1]) }
+                appendInlineContent(iconId)
+            }
+            Box {
+                Row {
+                    Text(
+                        text = "${weight.intValue}",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = LightGreen40,
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = annotatedText,
+                        inlineContent = mapOf(iconId to inlineIcon),
+                        modifier = Modifier.clickable { weightExpanded = !weightExpanded })
+                    DropdownMenu(
+                        expanded = weightExpanded,
+                        onDismissRequest = { weightExpanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(weightMeasureItems[0]) },
+                            onClick = {
+                                weightExpanded = false
+                                weightSelected = true
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        MeasuringScaleComponent( matchingPosition = {
+            weight.intValue = it
         }
         )
     }
