@@ -1,6 +1,5 @@
 package online.nsandroid.smartbmicalculator.ui.compose
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -24,10 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.findRootCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -41,8 +38,6 @@ import online.nsandroid.smartbmicalculator.ui.util.findClosest
 
 @Composable
 fun MeasuringScaleComponent(
-    returnIndexAndXPosition: (Pair<Int, String>) -> Unit,
-    positionOfDot: ((Pair<Pair<Int, Int>, String>)) -> Unit,
     matchingPosition: (Int) -> Unit,
     list: MutableList<Int> = emptyList<Int>().toMutableList()
 ) {
@@ -66,9 +61,7 @@ fun MeasuringScaleComponent(
             for (i in 0..300) {
                 if (i == 0) list.clear()
                 ScaleLineComponent(index = i, returnIndexAndXPosition = {
-                    returnIndexAndXPosition(it)
                     list.add(it.first)
-                    positionOfDot(Pair(Pair(it.first, centerPositionOfDot.intValue), it.second))
                     centerPosition.value = it
 
                     // Calculation
@@ -132,9 +125,6 @@ fun ScaleLineComponent(
             modifier = Modifier
                 .fillMaxWidth()
                 .offset(y = (-30).dp)
-//                .onGloballyPositioned {
-//                    returnIndexAndXPosition(Pair(it.positionInRoot().x.toInt(), index.toString()))
-//                },
         )
     }
 }
@@ -179,6 +169,6 @@ fun ScaleCenterPointer(positionOfDot: (Int) -> Unit) {
 @Composable
 private fun PreviewMeasuringScaleComponent() {
     SmartBMICalculatorTheme {
-        MeasuringScaleComponent({}, {}, {})
+        MeasuringScaleComponent({})
     }
 }

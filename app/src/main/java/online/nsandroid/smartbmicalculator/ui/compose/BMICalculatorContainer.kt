@@ -1,6 +1,5 @@
 package online.nsandroid.smartbmicalculator.ui.compose
 
-import android.util.Log
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -49,7 +48,6 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
@@ -126,18 +124,11 @@ internal fun BMICalculatorContainer() {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Row {
-            Row(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(id = R.string.height),
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "${length.intValue}",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = LightGreen40,
-                )
-            }
+            Text(
+                text = stringResource(id = R.string.height),
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.weight(1f)
+            )
 
             val iconId = "linkIcon"
             val inlineIcon = InlineTextContent(
@@ -166,34 +157,33 @@ internal fun BMICalculatorContainer() {
                 appendInlineContent(iconId)
             }
             Box {
-                Text(
-                    text = annotatedText,
-                    inlineContent = mapOf(iconId to inlineIcon),
-                    modifier = Modifier.clickable { expanded = !expanded })
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(measureItems[0]) },
-                        onClick = {
-                            expanded = false
-                            meterSelected = true
-                        }
+                Row {
+                    Text(
+                        text = "${length.intValue}",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = LightGreen40,
                     )
-                    DropdownMenuItem(
-                        text = { Text(measureItems[1]) },
-                        onClick = {
-                            expanded = false
-                            meterSelected = false
-                        }
-                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = annotatedText,
+                        inlineContent = mapOf(iconId to inlineIcon),
+                        modifier = Modifier.clickable { expanded = !expanded })
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(measureItems[0]) },
+                            onClick = {
+                                expanded = false
+                                meterSelected = true
+                            }
+                        )
+                    }
                 }
             }
         }
-        MeasuringScaleComponent(returnIndexAndXPosition = {
-        }, positionOfDot = {
-        }, matchingPosition = {
+        MeasuringScaleComponent( matchingPosition = {
             length.intValue = it
         }
         )
