@@ -23,6 +23,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -55,6 +59,7 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
@@ -65,7 +70,7 @@ import online.nsandroid.smartbmicalculator.ui.theme.Grey
 import online.nsandroid.smartbmicalculator.ui.theme.LightGreen40
 
 @Composable
-internal fun BMICalculatorContainer() {
+internal fun BMICalculatorContainer(onCalculateClick: (String, Int, Int, Int) -> Unit) {
     val items = remember {
         listOf("Male", "Female")
     }
@@ -126,7 +131,7 @@ internal fun BMICalculatorContainer() {
             value = text,
             onValueChange = { text = it },
             shape = RoundedCornerShape(16.dp),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
             modifier = Modifier
                 .width(128.dp)
                 .background(Grey),
@@ -261,6 +266,23 @@ internal fun BMICalculatorContainer() {
             weight.intValue = it
         }
         )
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = LightGreen40),
+            shape = RoundedCornerShape(25),
+            onClick = { onCalculateClick(
+                items[selectedIndex],
+                text.toInt(),
+                length.intValue,
+                weight.intValue
+            ) },
+        ) {
+            Text(
+                modifier = Modifier.padding(vertical = 8.dp),
+                text = stringResource(id = R.string.calculate_your_bmi),
+                fontSize = 20.sp,
+            )
+        }
     }
 }
 

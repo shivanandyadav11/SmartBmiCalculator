@@ -1,9 +1,9 @@
 package online.nsandroid.smartbmicalculator.ui.compose
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.text.TextStyle
@@ -52,40 +51,41 @@ fun MeasuringScaleComponent(
 
     Spacer(modifier = Modifier.height(16.dp))
     Divider(color = Grey, thickness = 6.dp)
-    Row(
-        modifier = Modifier
-            .horizontalScroll(scrollState)
-            .padding(top = 8.dp)
-            .fillMaxWidth(),
-        content = {
-            for (i in 0..300) {
-                if (i == 0) list.clear()
-                ScaleLineComponent(index = i, returnIndexAndXPosition = {
-                    list.add(it.first)
-                    centerPosition.value = it
-
-                    // Calculation
-                    val closetValue = list.findClosest(centerPositionOfDot.intValue)
-                    val index = list.indexOf(closetValue)
-                    matchingPosition(index)
-                    if (list.size > 300) {
-                        list.removeAt(0)
-                    }
-                })
-            }
+    Box {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .fillMaxWidth()
+        ) {
+            ScaleCenterPointer(positionOfDot = {
+                centerPositionOfDot.intValue = it
+            })
         }
-    )
+        Row(
+            modifier = Modifier
+                .horizontalScroll(scrollState)
+                .padding(top = 8.dp)
+                .fillMaxWidth(),
+            content = {
+                for (i in 0..300) {
+                    if (i == 0) list.clear()
+                    ScaleLineComponent(index = i, returnIndexAndXPosition = {
+                        list.add(it.first)
+                        centerPosition.value = it
 
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .padding(top = 8.dp)
-            .fillMaxWidth()
-    ) {
-        ScaleCenterPointer(positionOfDot = {
-            centerPositionOfDot.intValue = it
-        })
+                        // Calculation
+                        val closetValue = list.findClosest(centerPositionOfDot.intValue)
+                        val index = list.indexOf(closetValue)
+                        matchingPosition(index)
+                        if (list.size > 300) {
+                            list.removeAt(0)
+                        }
+                    })
+                }
+            }
+        )
     }
 }
 
@@ -96,10 +96,7 @@ fun ScaleLineComponent(
 ) {
     val isDivisibleBy10 = index % 10 == 0
 
-    Column(
-        modifier = Modifier
-            .background(Color.White)
-    ) {
+    Column {
         Canvas(
             modifier = Modifier
                 .padding(4.dp)
@@ -137,7 +134,7 @@ fun ScaleCenterPointer(positionOfDot: (Int) -> Unit) {
         Canvas(
             modifier = Modifier
                 .padding(5.dp)
-                .offset(y = (-152).dp)
+                .offset(y = (-16).dp)
                 .width(3.dp),
         ) {
             drawCircle(
@@ -148,7 +145,7 @@ fun ScaleCenterPointer(positionOfDot: (Int) -> Unit) {
         Canvas(
             modifier = Modifier
                 .padding(5.dp)
-                .offset(y = (-164).dp)
+                .offset(y = (-16).dp)
                 .height(64.dp)
                 .width(3.dp)
                 .onGloballyPositioned {
