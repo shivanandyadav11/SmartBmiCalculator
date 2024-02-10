@@ -24,7 +24,8 @@ import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -66,11 +67,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import online.nsandroid.smartbmicalculator.R
-import online.nsandroid.smartbmicalculator.ui.theme.Grey
 import online.nsandroid.smartbmicalculator.ui.theme.LightGreen40
 
 @Composable
-internal fun BMICalculatorContainer(onCalculateClick: (String, Int, Int, Int) -> Unit) {
+internal fun BMICalculatorContainer(onCalculateClick: (String, String, Int, Int, Int) -> Unit) {
     val items = remember {
         listOf("Male", "Female")
     }
@@ -80,7 +80,8 @@ internal fun BMICalculatorContainer(onCalculateClick: (String, Int, Int, Int) ->
     }
     var expanded by remember { mutableStateOf(false) }
     var meterSelected by remember { mutableStateOf(true) }
-    var text by rememberSaveable { mutableStateOf("0") }
+    var name by rememberSaveable { mutableStateOf("") }
+    var age by rememberSaveable { mutableStateOf("") }
     var selectedIndex by remember {
         mutableIntStateOf(0)
     }
@@ -120,22 +121,36 @@ internal fun BMICalculatorContainer(onCalculateClick: (String, Int, Int, Int) ->
                 }
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = stringResource(id = R.string.age),
-            style = MaterialTheme.typography.headlineSmall,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            shape = RoundedCornerShape(16.dp),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-            modifier = Modifier
-                .width(128.dp)
-                .background(Grey),
-        )
+        Row {
+            OutlinedTextField(
+                value = name,
+                leadingIcon = { Icon(imageVector = Icons.Default.Face, contentDescription = null) },
+                trailingIcon = { Icon(imageVector = Icons.Default.Edit, contentDescription = null) },
+                modifier = Modifier
+                    .padding(8.dp)
+                    .weight(.8f)
+                    .fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Next),
+                label = { Text(text = "Your Name") },
+                placeholder = { Text(text = "") },
+                onValueChange = {
+                    name = it
+                }
+            )
+            OutlinedTextField(
+                value = age,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .weight(.25f)
+                    .fillMaxWidth(),
+                label = { Text(text = "Age") },
+                placeholder = { Text(text = "0") },
+                onValueChange = {
+                    age = it
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+            )
+        }
         Spacer(modifier = Modifier.height(16.dp))
         Row {
             Text(
@@ -271,8 +286,9 @@ internal fun BMICalculatorContainer(onCalculateClick: (String, Int, Int, Int) ->
             colors = ButtonDefaults.buttonColors(containerColor = LightGreen40),
             shape = RoundedCornerShape(25),
             onClick = { onCalculateClick(
+                name,
                 items[selectedIndex],
-                text.toInt(),
+                age.toInt(),
                 length.intValue,
                 weight.intValue
             ) },

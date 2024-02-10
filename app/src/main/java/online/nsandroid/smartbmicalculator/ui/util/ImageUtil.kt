@@ -19,7 +19,12 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 
-internal fun getBMIResultImage(rect: Rect, view: View, context: Context, imageShareStatus: (ImageShareStatus) -> Unit) {
+internal fun getBMIResultImage(
+    rect: Rect,
+    view: View,
+    context: Context,
+    imageShareStatus: (ImageShareStatus) -> Unit
+) {
 
     try {
         val bitmap = Bitmap.createBitmap(
@@ -72,7 +77,7 @@ internal fun getBMIResultImage(rect: Rect, view: View, context: Context, imageSh
 
 fun shareImage(context: Context, bitmap: Bitmap?) {
     fun getUri(context: Context, bitmap: Bitmap): Uri? {
-        val path: String = context.externalCacheDir.toString() + "/yourBMIResult.jpg"
+        val path: String = context.externalCacheDir.toString() + "/myBMIResult.jpg"
         val out: OutputStream?
         val file = File(path)
         try {
@@ -87,10 +92,11 @@ fun shareImage(context: Context, bitmap: Bitmap?) {
             context, context.packageName + ".provider", file
         )
     }
+
     val imageUri: Uri? = bitmap?.let { getUri(context, it) }
     val chooserIntent = Intent(Intent.ACTION_SEND)
     chooserIntent.type = "image/*"
-    chooserIntent.putExtra(Intent.EXTRA_TEXT, "Your Calculated BMI")
+    chooserIntent.putExtra(Intent.EXTRA_TEXT, "my Calculated BMI")
     chooserIntent.putExtra(Intent.EXTRA_STREAM, imageUri)
     chooserIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     try {

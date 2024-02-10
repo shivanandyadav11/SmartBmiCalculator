@@ -1,7 +1,6 @@
 package online.nsandroid.smartbmicalculator.navigation.destination
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -16,10 +15,11 @@ fun NavGraphBuilder.bmiCalculatorGraphDestination(
     viewModel: BmiCalculatorViewModel
 ) {
     composable(Screen.BMICalculatorScreen.route) {
-        BMICalculatorContainer(onCalculateClick = { gender, age, height, weight ->
+        BMICalculatorContainer(onCalculateClick = { name, gender, age, height, weight ->
             run {
                 viewModel.setUserData(
                     UserData(
+                        name = name,
                         gender = gender,
                         age = age,
                         height = height * 0.01,

@@ -79,7 +79,7 @@ internal fun BMIResultContainer(viewModel: BmiCalculatorViewModel, shareYourBMI:
                         .height(32.dp)
                 )
                 Text(
-                    text = stringResource(id = R.string.your_bmi_is),
+                    text = stringResource(id = R.string.your_bmi_is, userData.value.name),
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Start,
