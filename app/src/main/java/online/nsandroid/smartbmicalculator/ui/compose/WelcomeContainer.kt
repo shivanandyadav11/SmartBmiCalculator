@@ -31,9 +31,11 @@ import online.nsandroid.smartbmicalculator.ui.theme.LightGreen40
 
 @Composable
 internal fun WelcomeContainer(onClick: () -> Unit) {
-    Column(modifier = Modifier
-        .padding(horizontal = 16.dp)
-        .background(Color.White)) {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .background(Color.White)
+    ) {
         Spacer(modifier = Modifier.height(64.dp))
         Text(
             text = stringResource(id = R.string.calorie_calculator_heading),

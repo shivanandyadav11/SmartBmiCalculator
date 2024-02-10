@@ -1,5 +1,6 @@
 package online.nsandroid.smartbmicalculator.ui.compose
 
+import android.util.Log
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -48,6 +49,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
@@ -71,12 +73,15 @@ internal fun BMICalculatorContainer() {
     }
 
     val measureItems = remember {
-        listOf("Meter", "Centimeter")
+        listOf("Centimeter")
     }
     var expanded by remember { mutableStateOf(false) }
     var meterSelected by remember { mutableStateOf(true) }
     var text by rememberSaveable { mutableStateOf("0") }
     var selectedIndex by remember {
+        mutableIntStateOf(0)
+    }
+    val length = remember {
         mutableIntStateOf(0)
     }
 
@@ -121,11 +126,18 @@ internal fun BMICalculatorContainer() {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Row {
-            Text(
-                text = stringResource(id = R.string.height),
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.weight(1f)
-            )
+            Row(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(id = R.string.height),
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "${length.intValue}",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = LightGreen40,
+                )
+            }
 
             val iconId = "linkIcon"
             val inlineIcon = InlineTextContent(
@@ -179,7 +191,12 @@ internal fun BMICalculatorContainer() {
                 }
             }
         }
-        MeasuringScaleComponent()
+        MeasuringScaleComponent(returnIndexAndXPosition = {
+        }, positionOfDot = {
+        }, matchingPosition = {
+            length.intValue = it
+        }
+        )
     }
 }
 

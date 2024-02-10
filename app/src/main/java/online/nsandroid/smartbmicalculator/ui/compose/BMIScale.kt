@@ -1,5 +1,6 @@
 package online.nsandroid.smartbmicalculator.ui.compose
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -16,10 +17,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.findRootCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -29,78 +37,48 @@ import online.nsandroid.smartbmicalculator.ui.theme.DarkGrey
 import online.nsandroid.smartbmicalculator.ui.theme.Grey
 import online.nsandroid.smartbmicalculator.ui.theme.LightGreen40
 import online.nsandroid.smartbmicalculator.ui.theme.SmartBMICalculatorTheme
-
-
-@Composable
-fun ScaleCenterPointer() {
-    val primaryColor = LightGreen40
-
-    Column {
-        Canvas(
-            modifier = Modifier
-                .padding(5.dp)
-                .offset(y = (-112).dp)
-                .width(3.dp),
-        ) {
-            drawCircle(
-                color = primaryColor,
-                radius = 12.dp.toPx(),
-            )
-        }
-    }
-}
+import online.nsandroid.smartbmicalculator.ui.util.findClosest
 
 @Composable
-fun ScaleLineComponent(
-    index: Int
+fun MeasuringScaleComponent(
+    returnIndexAndXPosition: (Pair<Int, String>) -> Unit,
+    positionOfDot: ((Pair<Pair<Int, Int>, String>)) -> Unit,
+    matchingPosition: (Int) -> Unit,
+    list: MutableList<Int> = emptyList<Int>().toMutableList()
 ) {
-    val isDivisibleBy10 = index % 2 == 0
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White)
-    ) {
-        Canvas(
-            modifier = Modifier
-                .padding(12.dp)
-                .height(20.dp)
-                .fillMaxWidth()
-                .width(4.dp),
-        ) {
-            drawLine(
-                color = DarkGrey,
-                start = Offset(0f, 0f),
-                end = Offset(0f, if (isDivisibleBy10) size.height else size.height * 0.6f),
-                strokeWidth = if (isDivisibleBy10) size.width * 0.8F else size.width * 0.6f
-            )
-        }
-
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 4.dp),
-            text = if (isDivisibleBy10) "${index / 1}" else " ",
-            textAlign = TextAlign.Center,
-            style = TextStyle(fontFamily = FontFamily.Monospace),
-            color = DarkGrey,
-        )
-    }
-}
-
-@Composable
-fun MeasuringScaleComponent() {
     val scrollState = rememberScrollState()
+    val centerPosition = remember {
+        mutableStateOf(Pair(0, "0"))
+    }
+    val centerPositionOfDot = remember {
+        mutableIntStateOf(0)
+    }
+
+
     Spacer(modifier = Modifier.height(16.dp))
     Divider(color = Grey, thickness = 6.dp)
     Row(
         modifier = Modifier
             .horizontalScroll(scrollState)
-            .padding(top = 20.dp)
+            .padding(top = 8.dp)
             .fillMaxWidth(),
         content = {
-            for (i in -6..500) {
-                ScaleLineComponent(index = i)
+            for (i in 0..300) {
+                if (i == 0) list.clear()
+                ScaleLineComponent(index = i, returnIndexAndXPosition = {
+                    returnIndexAndXPosition(it)
+                    list.add(it.first)
+                    positionOfDot(Pair(Pair(it.first, centerPositionOfDot.intValue), it.second))
+                    centerPosition.value = it
+
+                    // Calculation
+                    val closetValue = list.findClosest(centerPositionOfDot.intValue)
+                    val index = list.indexOf(closetValue)
+                    matchingPosition(index)
+                    if (list.size > 300) {
+                        list.removeAt(0)
+                    }
+                })
             }
         }
     )
@@ -109,10 +87,91 @@ fun MeasuringScaleComponent() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .padding(top = 20.dp)
+            .padding(top = 8.dp)
             .fillMaxWidth()
     ) {
-        ScaleCenterPointer()
+        ScaleCenterPointer(positionOfDot = {
+            centerPositionOfDot.intValue = it
+        })
+    }
+}
+
+@Composable
+fun ScaleLineComponent(
+    index: Int,
+    returnIndexAndXPosition: (Pair<Int, String>) -> Unit,
+) {
+    val isDivisibleBy10 = index % 10 == 0
+
+    Column(
+        modifier = Modifier
+            .background(Color.White)
+    ) {
+        Canvas(
+            modifier = Modifier
+                .padding(4.dp)
+                .height(100.dp)
+                .width(3.dp)
+                .onGloballyPositioned {
+                    returnIndexAndXPosition(Pair(it.positionInRoot().x.toInt(), index.toString()))
+                },
+        ) {
+            drawLine(
+                color = DarkGrey,
+                start = Offset(0f, 0f),
+                end = Offset(0f, if (isDivisibleBy10) size.height * 0.7f else size.height * 0.2f),
+                strokeWidth = if (isDivisibleBy10) size.width else size.width * 0.3f
+            )
+        }
+
+        Text(
+            text = if (isDivisibleBy10) "$index" else "",
+            textAlign = TextAlign.Center,
+            style = TextStyle(fontFamily = FontFamily.Monospace),
+            color = DarkGrey,
+            modifier = Modifier
+                .fillMaxWidth()
+                .offset(y = (-30).dp)
+//                .onGloballyPositioned {
+//                    returnIndexAndXPosition(Pair(it.positionInRoot().x.toInt(), index.toString()))
+//                },
+        )
+    }
+}
+
+@Composable
+fun ScaleCenterPointer(positionOfDot: (Int) -> Unit) {
+    val primaryColor = LightGreen40
+
+    Column {
+        Canvas(
+            modifier = Modifier
+                .padding(5.dp)
+                .offset(y = (-152).dp)
+                .width(3.dp),
+        ) {
+            drawCircle(
+                color = primaryColor,
+                radius = 12.dp.toPx(),
+            )
+        }
+        Canvas(
+            modifier = Modifier
+                .padding(5.dp)
+                .offset(y = (-164).dp)
+                .height(64.dp)
+                .width(3.dp)
+                .onGloballyPositioned {
+                    positionOfDot(it.positionInRoot().x.toInt())
+                },
+        ) {
+            drawLine(
+                color = primaryColor,
+                start = Offset(0f, 0f),
+                end = Offset(0f, size.height),
+                strokeWidth = size.width
+            )
+        }
     }
 }
 
@@ -120,6 +179,6 @@ fun MeasuringScaleComponent() {
 @Composable
 private fun PreviewMeasuringScaleComponent() {
     SmartBMICalculatorTheme {
-        MeasuringScaleComponent()
+        MeasuringScaleComponent({}, {}, {})
     }
 }
