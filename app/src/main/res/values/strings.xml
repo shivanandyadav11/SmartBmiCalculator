@@ -11,5 +11,6 @@
     <string name="weight">Weight</string>
     <string name="calculate_your_bmi">Calculate Your BMI</string>
     <string name="your_bmi_is">Your BMI is</string>
+    <string name="share_your_bmi">Share your BMI</string>
     <string name="calorie_calculator_para">Accurately calculate daily calories required for weight loss or maintenance</string>
 </resources>
