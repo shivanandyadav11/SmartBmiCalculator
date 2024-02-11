@@ -66,6 +66,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.text.isDigitsOnly
 import online.nsandroid.smartbmicalculator.R
 import online.nsandroid.smartbmicalculator.ui.theme.LightGreen40
 
@@ -146,7 +147,9 @@ internal fun BMICalculatorContainer(onCalculateClick: (String, String, Int, Int,
                 label = { Text(text = "Age") },
                 placeholder = { Text(text = "0") },
                 onValueChange = {
-                    age = it
+                    if(it.isDigitsOnly()) {
+                        age = it
+                    }
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
             )
@@ -288,7 +291,7 @@ internal fun BMICalculatorContainer(onCalculateClick: (String, String, Int, Int,
             onClick = { onCalculateClick(
                 name,
                 items[selectedIndex],
-                age.toInt(),
+                if(age.isNotEmpty()) age.toInt() else 0,
                 length.intValue,
                 weight.intValue
             ) },
